@@ -10,7 +10,7 @@ class Chip8 {
         this.display = new Uint8Array(64 * 32);
         this.delaytimer = 0;
         this.soundtimer = 0;
-
+        this.keys = new Uint8Array(16);
     }
 
     // Logic
@@ -137,4 +137,3 @@ class Chip8 {
     }
 
 }
-

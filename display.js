@@ -1,3 +1,5 @@
+// I hate debugging T-T
+
 class Display {
     constructor(canvas, scale = 10) {
         this.cols = 64;
@@ -7,7 +9,7 @@ class Display {
         canvas.height = this.rows * this.scale;
         this.ctx = canvas.getContext('2d');
     }
-
+    // Why does it matter if FillStyle has S capital or not T-T
     render(buffer) {
         this.ctx.fillStyle = '#000';
         this.ctx.fillRect(0, 0, this.cols * this.scale, this.rows * this.scale);

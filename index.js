@@ -1,3 +1,5 @@
+// I am the storm that is approachingg
+
 const canvas = document.getElementById('chip8-canvas');
 const chip8 = new Chip8();
 const display = new Display(canvas, 10);

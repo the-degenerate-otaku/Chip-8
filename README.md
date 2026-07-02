@@ -3,7 +3,7 @@ Chip-8 is a Interpreted programming language made by Joseph Weisbecker (1977) ma
 This version of Chip-8 is written JS as it way easier than to write it in C or Python 
 
 ## Status
-- Currently in Devlopment : Core structure is ready including CPU, Rendering and Input, passed IBM test
+- Currently in Devlopment : Core structure is ready including CPU, Rendering and Input, passed IBM logo test
 
 ## How Does it Work?
 > ```text

@@ -5,7 +5,7 @@ const input = new Input(chip8.keys);
 
 function loop() {
     for (let i = 0; i < 10; i++) {
-        chip8.emulatedCycle();
+        chip8.emulateCycle();
 
     }
     display.render(chip8.display);
@@ -15,6 +15,6 @@ function loop() {
 fetch('roms/ibm-logo.ch8')
     .then(res => res.arrayBuffer())
     .then(Buffer => {
-        chip8.loadRom(buffer);
+        chip8.loadRom(Buffer);
         requestAnimationFrame(loop);
     });

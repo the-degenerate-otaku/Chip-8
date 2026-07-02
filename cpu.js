@@ -14,59 +14,52 @@ class Chip8 {
     }
 
     // Logic
-    emulatecycle() {
-        const opcode = (this.memory[this.pc] << 8 | this.memory[this.pc + 1]);
+    emulateCycle() {
+        const opcode = (this.memory[this.pc] << 8) | this.memory[this.pc + 1];
         const firstnibble = (opcode & 0xf000) >> 12;
-        const x = (opcode & 0x0f00) >> 12;
+        const x = (opcode & 0x0f00) >> 8;
         const y = (opcode & 0x00f0) >> 4;
         const nn = opcode & 0x00ff;
         const nnn = opcode & 0x0fff;
 
         switch (firstnibble) {
             case 0x0:
-                if (opcode === 0x00E00) {
+                if (opcode === 0x00E0) {
                     this.display.fill(0);
                 } else if (opcode === 0x00EE) {
                     this.sp--;
                     this.pc = this.stack[this.sp];
                     return;
-
                 }
                 break;
-            case 0x1:
 
+            case 0x1:
                 this.pc = nnn;
                 return;
 
             case 0x2:
-
                 this.stack[this.sp] = this.pc;
                 this.sp++;
                 this.pc = nnn;
                 return;
 
             case 0x3:
-
-                if (this.V[x] !== nn) this.pc += 2;
+                if (this.V[x] === nn) this.pc += 2;
                 break;
 
             case 0x4:
-
                 if (this.V[x] !== nn) this.pc += 2;
                 break;
 
             case 0x5:
-
                 if (this.V[x] === this.V[y]) this.pc += 2;
                 break;
 
             case 0x6:
-
                 this.V[x] = nn;
                 break;
 
             case 0x7:
-
                 this.V[x] = (this.V[x] + nn) & 0xff;
                 break;
 
@@ -80,12 +73,12 @@ class Chip8 {
                     case 0x4: {
                         const sum = this.V[x] + this.V[y];
                         this.V[x] = sum & 0xff;
-                        this.V[0xf] = sum > 0xff ? 1 : 0;
+                        this.V[0xF] = sum > 0xff ? 1 : 0;
                         break;
                     }
                     case 0x5: {
-                        this.V[0xF] = this.V[x] > this.V[y] ? 1 : 0;;
-                        this.V[x] = sum & 0xff;
+                        this.V[0xF] = this.V[x] > this.V[y] ? 1 : 0;
+                        this.V[x] = (this.V[x] - this.V[y]) & 0xff;
                         break;
                     }
                     case 0x6: {
@@ -94,46 +87,64 @@ class Chip8 {
                         break;
                     }
                     case 0x7: {
-                        this.V[0xF] = thisV[y] > this.V[x] ? 1 : 0;
+                        this.V[0xF] = this.V[y] > this.V[x] ? 1 : 0;
                         this.V[x] = (this.V[y] - this.V[x]) & 0xff;
                         break;
-
                     }
-
                 }
                 break;
             }
 
             case 0x9:
-
-                if (this.V[x] !== this.v[y]) this.pc += 2;
+                if (this.V[x] !== this.V[y]) this.pc += 2;
                 break;
 
             case 0xA:
-
                 this.I = nnn;
                 break;
 
             case 0xD:
-
                 this.drawSprite(x, y, opcode & 0x000f);
                 break;
 
             default:
-
-                console.log('Unknown opcode: ${opcode.toString(16)}}');
+                console.log(`Unknown opcode: ${opcode.toString(16)}`);
         }
         this.pc += 2;
     }
 
+    drawSprite(x, y, height) {
+        const vx = this.V[x];
+        const vy = this.V[y];
+        this.V[0xF] = 0;
+
+        for (let row = 0; row < height; row++) {
+            const spriteByte = this.memory[this.I + row];
+
+            for (let col = 0; col < 8; col++) {
+                const spritePixel = (spriteByte & (0x80 >> col)) !== 0 ? 1 : 0;
+
+                if (spritePixel === 1) {
+                    const px = (vx + col) % 64;
+                    const py = (vy + row) % 32;
+                    const index = py * 64 + px;
+
+                    if (this.display[index] === 1) {
+                        this.V[0xF] = 1;
+                    }
+                    this.display[index] ^= 1;
+                }
+            }
+        }
+    }
+
     // load da ROM
     loadRom(buffer) {
-        const data = new Uint8array(buffer);
+        const data = new Uint8Array(buffer);
         this.memory.fill(0);
         this.pc = 0x200;
         for (let i = 0; i < data.length; i++) {
             this.memory[0x200 + i] = data[i];
         }
     }
-
 }

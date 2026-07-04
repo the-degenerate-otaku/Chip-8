@@ -1,9 +1,9 @@
 # CHIP-8 (JavaScript)
-Chip-8 is a Interpreted programming language made by Joseph Weisbeccker (1977) made to write video games onn old 8-bit computers easier 
-This version of Chip-8 in JS as it way easier than to write it in C or Python 
+Chip-8 is a Interpreted programming language made by Joseph Weisbecker (1977) made to write video games on old 8-bit computers easier 
+This version of Chip-8 is written JS as it way easier than to write it in C or Python 
 
 ## Status
-- Currently in Devlopment : Core structure is ready including CPU, Rendering and Input, passed IBM test
+- Currently in Devlopment : Core structure is ready including CPU, Rendering and Input, passed IBM logo test
 
 ## How Does it Work?
 > ```text

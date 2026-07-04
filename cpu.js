@@ -52,7 +52,7 @@ class Chip8 {
                 } else if (opcode === 0x00EE) {
                     this.sp--;
                     this.pc = this.stack[this.sp];
-                    return;
+
                 }
                 break;
 
@@ -89,35 +89,57 @@ class Chip8 {
             case 0x8: {
                 const lastnibble = opcode & 0x000f;
                 switch (lastnibble) {
-                    case 0x0: this.V[x] = this.V[y]; break;
-                    case 0x1: this.V[x] |= this.V[y]; break;
-                    case 0x2: this.V[x] &= this.V[y]; break;
-                    case 0x3: this.V[x] ^= this.V[y]; break;
+                    case 0x0:
+                        this.V[x] = this.V[y];
+                        break;
+                    case 0x1:
+                        this.V[x] = this.V[x] | this.V[y];
+                        break;
+                    case 0x2:
+                        this.V[x] = this.V[x] & this.V[y];
+                        break;
+                    case 0x3:
+                        this.V[x] = this.V[x] ^ this.V[y];
+                        break;
                     case 0x4: {
                         const sum = this.V[x] + this.V[y];
-                        this.V[x] = sum & 0xff;
-                        this.V[0xF] = sum > 0xff ? 1 : 0;
+                        const result = sum & 0xff;
+                        const flag = sum > 0xff ? 1 : 0;
+                        this.V[x] = result;
+                        this.V[0xF] = flag;
                         break;
                     }
                     case 0x5: {
-                        this.V[0xF] = this.V[x] > this.V[y] ? 1 : 0;
-                        this.V[x] = (this.V[x] - this.V[y]) & 0xff;
+                        const result = (this.V[x] - this.V[y]) & 0xff;
+                        const flag = this.V[x] >= this.V[y] ? 1 : 0;
+                        this.V[x] = result;
+                        this.V[0xF] = flag;
                         break;
                     }
                     case 0x6: {
-                        this.V[0xF] = this.V[x] & 0x1;
-                        this.V[x] = this.V[x] >> 1;
+                        const flag = this.V[y] & 0x1;
+                        const result = this.V[y] >> 1;
+                        this.V[x] = result;
+                        this.V[0xF] = flag;
                         break;
                     }
                     case 0x7: {
-                        this.V[0xF] = this.V[y] > this.V[x] ? 1 : 0;
-                        this.V[x] = (this.V[y] - this.V[x]) & 0xff;
+                        const result = (this.V[y] - this.V[x]) & 0xff;
+                        const flag = this.V[y] >= this.V[x] ? 1 : 0;
+                        this.V[x] = result;
+                        this.V[0xF] = flag;
+                        break;
+                    }
+                    case 0xE: {
+                        const flag = (this.V[y] & 0x80) >> 7;
+                        const result = (this.V[y] << 1) & 0xff;
+                        this.V[x] = result;
+                        this.V[0xF] = flag;
                         break;
                     }
                 }
                 break;
             }
-
             case 0x9:
                 if (this.V[x] !== this.V[y]) this.pc += 2;
                 break;
@@ -127,7 +149,7 @@ class Chip8 {
                 break;
 
             case 0xB:
-                this.pc = (nnnn + this.V[0]) & 0xFFF;
+                this.pc = (nnn + this.V[0]) & 0xFFF;
                 return;
 
             case 0xC:
@@ -196,7 +218,7 @@ class Chip8 {
                         break;
 
                     case 0x65:
-                        for (let i = 0; 1 <= x; i++) {
+                        for (let i = 0; i <= x; i++) {
                             this.V[i] = this.memory[this.I + i];
                         }
                         break;

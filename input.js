@@ -11,12 +11,12 @@ class Input {
 
         window.addEventListener('keydown', (e) => {
             const key = KEYMAP[e.key.toLowerCase()];
-            if (key !== undefined) this.keys[keys] = 1;
+            if (key !== undefined) this.keys[key] = 1;
         });
 
         window.addEventListener('keyup', (e) => {
             const key = KEYMAP[e.key.toLowerCase()];
-            if (key !== undefined) this.key[keys] = 0;
+            if (key !== undefined) this.keys[key] = 0;
         });
     }
 }

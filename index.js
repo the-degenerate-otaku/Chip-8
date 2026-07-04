@@ -18,7 +18,7 @@ function loop() {
     requestAnimationFrame(loop);
 }
 
-fetch('roms/ibm-logo.ch8')
+fetch('roms/4-flags.ch8')
     .then(res => res.arrayBuffer())
     .then(Buffer => {
         chip8.loadRom(Buffer);

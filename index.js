@@ -2,7 +2,7 @@
 
 const canvas = document.getElementById('chip8-canvas');
 const chip8 = new Chip8();
-const display = new Display(canvas, 10);
+const display = new Display(canvas, 20);
 const input = new Input(chip8.keys);
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let oscillator = null;
@@ -35,15 +35,32 @@ setInterval(() => {
 function loop() {
     for (let i = 0; i < 10; i++) {
         chip8.emulateCycle();
-
     }
     display.render(chip8.display);
-    requestAnimationFrame(loop);
+    animationFrameId = requestAnimationFrame(loop);
 }
 
-fetch('roms/Pong.ch8') // games actually work tf T-T
+const romPicker = document.getElementById('rom-picker');
+let animationFrameId = null;
+function startGame(buffer) {
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    chip8.reset()
+    chip8.loadRom(buffer);
+    stopBeep();
+    animationFrameId = requestAnimationFrame(loop);
+}
+romPicker.addEventListener('change', (e) => {
+    const file = e.target.files[0]
+    if (!file) return;
+    const reader = new FileReader
+    reader.onload = (event) => {
+        startGame(event.target.result);
+    };
+    reader.readAsArrayBuffer(file);
+});
+
+fetch('roms/Pong.ch8')
     .then(res => res.arrayBuffer())
-    .then(Buffer => {
-        chip8.loadRom(Buffer);
-        requestAnimationFrame(loop);
+    .then(buffer => {
+        startGame(buffer);
     });

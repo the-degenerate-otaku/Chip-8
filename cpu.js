@@ -1,5 +1,5 @@
 const FONTSET = [
-    0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+    0xF0, 0x90, 0x90, 0x90, 0xF0, //0
     0x20, 0x60, 0x20, 0x20, 0x70, //1
     0xF0, 0x10, 0xF0, 0x80, 0xF0, //2
     0xF0, 0x10, 0xF0, 0x10, 0xF0, //3
@@ -263,6 +263,23 @@ class Chip8 {
         if (this.soundtimer > 0) this.soundtimer--;
     }
 
+    reset() {
+        this.memory.fill(0);
+        this.V.fill(0);
+        this.I = 0;
+        this.pc = 0x200;
+        this.stack.fill(0);
+        this.sp = 0;
+        this.display.fill(0);
+        this.delaytimer = 0;
+        this.soundtimer = 0;
+        this.keys.fill(0);
+
+        for (let i = 0; i < FONTSET.length; i++) {
+            this.memory[0x50 + i] = FONTSET[i];
+        }
+    }
+
     // load da ROM
     loadRom(buffer) {
         const data = new Uint8Array(buffer);
@@ -273,3 +290,4 @@ class Chip8 {
         }
     }
 }
+

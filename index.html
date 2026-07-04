@@ -8,7 +8,8 @@
       body {
         background: #111;
         display: flex;
-        justify-content: centre;
+        flex-direction: column;
+        align-items: center;
         margin-top: 40px;
       }
       canvas {
@@ -17,8 +18,10 @@
     </style>
   </head>
   <body>
+    <div style="text-align: center; margin-bottom: 10px">
+      <input type="file" id="rom-picker" accept=".ch8" />
+    </div>
     <canvas id="chip8-canvas"></canvas>
-
     <script src="cpu.js"></script>
     <script src="display.js"></script>
     <script src="input.js"></script>

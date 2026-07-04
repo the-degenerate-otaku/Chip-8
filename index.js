@@ -5,6 +5,10 @@ const chip8 = new Chip8();
 const display = new Display(canvas, 10);
 const input = new Input(chip8.keys);
 
+setInterval(() => {
+    chip8.updateTimer();
+}, 1000 / 60);
+
 function loop() {
     for (let i = 0; i < 10; i++) {
         chip8.emulateCycle();

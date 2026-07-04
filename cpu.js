@@ -1,4 +1,23 @@
-// Hardware limiter
+const FONTSET = [
+    0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+    0x20, 0x60, 0x20, 0x20, 0x70, //1
+    0xF0, 0x10, 0xF0, 0x80, 0xF0, //2
+    0xF0, 0x10, 0xF0, 0x10, 0xF0, //3
+    0x90, 0x90, 0xF0, 0x10, 0x10, //4
+    0xF0, 0x80, 0xF0, 0x10, 0xF0, //5
+    0xF0, 0x80, 0xF0, 0x90, 0xF0, //6
+    0xF0, 0x10, 0x20, 0x40, 0x40, //7
+    0xF0, 0x90, 0xF0, 0x90, 0xF0, //8
+    0xF0, 0x90, 0xF0, 0x10, 0xF0, //9
+    0xF0, 0x90, 0xF0, 0x90, 0x90, //A
+    0xE0, 0x90, 0xE0, 0x90, 0xE0, //B
+    0xF0, 0x80, 0x80, 0x80, 0xF0, //C
+    0xE0, 0x90, 0x90, 0x90, 0xE0, //D
+    0xF0, 0x80, 0xF0, 0x80, 0xF0, //E
+    0xF0, 0x80, 0xF0, 0x80, 0x80, //F
+];
+
+// limiter to make the chip 8 
 class Chip8 {
     constructor() {
         this.memory = new Uint8Array(4096);
@@ -11,9 +30,13 @@ class Chip8 {
         this.delaytimer = 0;
         this.soundtimer = 0;
         this.keys = new Uint8Array(16);
+
+        for (let i = 0; i < FONTSET.length; i++) {
+            this.memory[0x50 + i] = FONTSET[i];
+        }
     }
 
-    // Logic
+    // logic
     emulateCycle() {
         const opcode = (this.memory[this.pc] << 8) | this.memory[this.pc + 1];
         const firstnibble = (opcode & 0xf000) >> 12;
@@ -103,9 +126,83 @@ class Chip8 {
                 this.I = nnn;
                 break;
 
+            case 0xB:
+                this.pc = (nnnn + this.V[0]) & 0xFFF;
+                return;
+
+            case 0xC:
+                this.V[x] = Math.floor(Math.random() * 256) & nn;
+                break;
+
             case 0xD:
                 this.drawSprite(x, y, opcode & 0x000f);
                 break;
+
+            case 0xE:
+                if (nn === 0x9E) {
+                    if (this.keys[this.V[x]] === 1) this.pc += 2;
+                } else if (nn === 0xA1) {
+                    if (this.keys[this.V[x]] !== 1) this.pc += 2;
+                }
+                break;
+
+            case 0xF: {
+                switch (nn) {
+                    case 0x07:
+                        this.V[x] = this.delaytimer;
+                        break;
+
+                    case 0x0A: {
+                        let keyPressed = false;
+                        for (let i = 0; i < 16; i++) {
+                            if (this.keys[i] === 1) {
+                                this.V[x] = i;
+                                keyPressed = true;
+                                break;
+                            }
+                        }
+                        if (!keyPressed) return;
+                        break;
+                    }
+
+                    case 0x15:
+                        this.delaytimer = this.V[x];
+                        break;;
+
+                    case 0x18:
+                        this.soundtimer = this.V[x];
+                        break;
+
+                    case 0x1E:
+                        this.I = (this.I + this.V[x]) & 0xFFF;
+                        break;
+
+                    case 0x29:
+                        this.I = 0x50 + (this.V[x] * 5);
+                        break;
+
+                    case 0x33: {
+                        const value = this.V[x];
+                        this.memory[this.I] = Math.floor(value / 100);
+                        this.memory[this.I + 1] = Math.floor((value % 100) / 10);
+                        this.memory[this.I + 2] = value % 10;
+                        break;
+                    }
+
+                    case 0x55:
+                        for (let i = 0; i <= x; i++) {
+                            this.memory[this.I + i] = this.V[i];
+                        }
+                        break;
+
+                    case 0x65:
+                        for (let i = 0; 1 <= x; i++) {
+                            this.V[i] = this.memory[this.I + i];
+                        }
+                        break;
+                }
+                break;
+            }
 
             default:
                 console.log(`Unknown opcode: ${opcode.toString(16)}`);
@@ -136,6 +233,12 @@ class Chip8 {
                 }
             }
         }
+    }
+
+    // timer type shi
+    updateTimer() {
+        if (this.delaytimer > 0) this.delaytimer--;
+        if (this.soundtimer > 0) this.soundtimer--;
     }
 
     // load da ROM

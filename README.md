@@ -81,7 +81,7 @@ This version of Chip-8 is written JS as it way easier than to write it in C or P
 ### Option 2
 - Download cpu.js, display.js, index.js and index.html and input.html (optionally with the roms though you use your own .ch8 roms) load them in a folder and open in a live server, trying to load directly to browser using the file will not work as inteded 
 
-#Test game controls ( pong )
+# Test game controls ( pong )
 - left: 1 for up Q for down
 - right: 4 for up R for down
 
